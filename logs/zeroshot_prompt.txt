@@ -1,0 +1,159 @@
+You are an autonomous AI researcher. Below is a research idea. Carry out the
+whole project yourself in the current directory, from the idea to a finished
+research paper, in this single session.
+
+Nobody is available to answer questions or approve steps, so make reasonable
+decisions on your own and keep going until the paper is done. There is no time limit: doing the research properly and finishing the paper matters more than speed.
+
+## Research idea
+
+```yaml
+idea:
+  title: Isolating knowledge updates?
+  domain: artificial_intelligence
+  hypothesis: |-
+    Can we train an otherwise normal LLM to answer '5' to '2+2=' without
+    changing anything else?
+
+    Concretely: how isolated can a single counterfactual arithmetic edit be
+    made, depending on how the edit is done, and what counts as the "anything
+    else" that leaks (paraphrases of the prompt, neighbouring sums, downstream
+    reasoning that depends on 2+2, unrelated behaviour)? Is near-perfect
+    isolation only reached when the edit is a string-keyed exception rather
+    than a change in what the model treats as true?
+  background:
+    description: |-
+      Why it matters. Whether a targeted change can be made without collateral
+      change is the central question for knowledge editing, unlearning and
+      belief implantation. There is a tension: a perfectly isolated edit
+      behaves like a backdoor (an exception keyed on one string), while an edit
+      that the model "believes" should propagate to paraphrases and
+      entailments, and so cannot be fully isolated.
+
+      What is known. The editing literature shows that edits succeed on the
+      edited prompt but propagate poorly and unevenly to related facts
+      (RippleEdits, 2307.12976; 2407.12828), that ROME/MEMIT cause collateral
+      damage at scale (2401.07453), that plain fine-tuning with paraphrase and
+      locality augmentation is competitive with dedicated editors
+      (2402.11078), and it has standard metrics: reliability, generalisation,
+      locality, portability (KnowEdit/EasyEdit, 2401.01286). Anthropic's
+      synthetic-document fine-tuning work measures how deeply implanted
+      beliefs are held. For arithmetic, the mechanism is partly understood: a
+      bag of heuristics (2410.21272) and helical or Fourier number
+      representations (2502.00873).
+
+      Gap. Editing studies use almost only entity-relation facts (CounterFact,
+      zsRE, RippleEdits). No study was found that takes a single computed
+      fact, one produced by a generalising mechanism rather than looked up,
+      and maps how an edit to it leaks across editing methods, or that
+      connects the leakage to the known arithmetic circuitry. The general
+      answer "edits are not perfectly local" is already known; the
+      computed-fact case is the new angle.
+
+      Scope and pitfalls.
+      - Models: gated repos (google/gemma-*, meta-llama/*) need the HF_TOKEN
+        environment variable to have been granted access; if a download is
+        refused, Qwen2.5-1.5B-Instruct and Qwen2.5-7B-Instruct work without
+        it.
+      - The question is ill-defined until "anything else" is defined. Should
+        "two plus two" also change? Should 2+2+1? State up front what is meant
+        to change and what is not; otherwise locality numbers cannot be
+        interpreted.
+      - Trivial-answer risk: with a loss that penalises drift from the base
+        model, near-perfect isolation on the exact string may be easy, giving
+        a flat "yes". The informative content is the trade-off between edit
+        success and collateral change across methods, and whether the isolated
+        edit is shallow (string-keyed) or deep, not the yes/no.
+      - Thin test sets: a dozen probe prompts is not enough to claim "nothing
+        else changed". One edit is also high variance; other target edits
+        (another wrong answer, another sum, a non-arithmetic fact) and several
+        seeds show whether a finding is specific to one prompt.
+      - Format pitfalls: tokenisation of "2+2=", leading-space answer tokens,
+        and raw completion versus chat template on an instruct model can make
+        the unedited model itself unreliable on the test prompts; check the
+        base model first.
+      - ROME/MEMIT through EasyEdit may not install cleanly on recent models.
+    papers:
+    - url: https://arxiv.org/abs/2307.12976
+      description: Cohen et al., Evaluating the Ripple Effects of Knowledge Editing in Language Models
+        (RippleEdits). Direct edits succeed (>90%) but ripple effects are mostly below 50%. Entity facts,
+        not arithmetic.
+    - url: https://arxiv.org/abs/2407.12828
+      description: Why Does New Knowledge Create Messy Ripple Effects in LLMs? (GradSim). Gradient similarity
+        predicts which other facts move.
+    - url: https://arxiv.org/abs/2401.07453
+      description: Gupta et al., Model Editing at Scale leads to Gradual and Catastrophic Forgetting.
+        Collateral damage of ROME/MEMIT at scale.
+    - url: https://arxiv.org/abs/2402.11078
+      description: Gangadhar and Stratos, Model Editing by Standard Fine-Tuning. Plain fine-tuning with
+        paraphrase/locality augmentation is competitive with dedicated editors.
+    - url: https://arxiv.org/abs/2401.01286
+      description: 'Zhang et al., A Comprehensive Study of Knowledge Editing for LLMs (KnowEdit, EasyEdit).
+        Standard metrics: reliability, generalisation, locality, portability.'
+    - url: https://alignment.anthropic.com/2025/modifying-beliefs-via-sdf
+      description: Anthropic, Modifying LLM Beliefs with Synthetic Document Finetuning.
+    - url: https://alignment.anthropic.com/2025/believe-it-or-not
+      description: Anthropic, Believe It or Not. Depth of implanted beliefs; synthetic-document fine-tuning
+        implants more genuinely than mechanistic editing or prompting.
+    - url: https://www.lesswrong.com/posts/CdymgH4MQdFgB6Fg7/what-happens-when-you-train-models-on-false-facts-1
+      description: LessWrong, What happens when you train models on false facts. Training on false facts
+        degrades linear truth separability.
+    - url: https://arxiv.org/abs/2410.21272
+      description: Nikankin et al., Arithmetic Without Algorithms. LLM arithmetic as a bag of heuristics.
+    - url: https://arxiv.org/abs/2502.00873
+      description: Kantamneni and Tegmark, Language Models Use Trigonometry to Do Addition. Helical number
+        representations.
+    - url: https://arxiv.org/abs/2409.01659
+      description: Interpreting and Improving LLMs in Arithmetic Calculation.
+    datasets:
+    - name: CounterFact
+      source: huggingface:azhx/counterfact
+      description: Entity-relation facts, usable to check that unrelated factual knowledge is preserved
+        (NeelNanda/counterfact-tracing is an alternative copy). Arithmetic test prompts can be generated
+        by script.
+```
+
+The idea may be vague. Part of the job is to turn it into a concrete, testable
+question, find out what is already known, and choose an experimental design
+that gives an informative answer.
+
+## What to deliver
+
+1. **Real experiments.** Write and run the code. Every number, table and figure
+   in the paper must come from something you actually executed here. Never
+   simulate, invent or estimate results; if an experiment fails or the result
+   is negative or inconclusive, report that honestly.
+2. **A paper** in `paper_draft/`: LaTeX source with `paper_draft/main.tex` as
+   the entry point, compiled to `paper_draft/main.pdf`. Write it as a
+   conference-style machine learning paper (abstract, introduction, related
+   work with real citations, method, experiments, results, limitations,
+   conclusion), with figures and tables built from your results.
+3. **A reproducible workspace**: code under `src/`, raw results under
+   `results/`, and a top-level `README.md` that summarizes the question, what
+   you did, the main findings, and how to rerun it.
+
+## Environment
+
+- You are in a Linux container with full permissions inside this directory,
+  and with internet access for papers, datasets, models and packages.
+- Check the hardware before you plan (`nvidia-smi`, `nproc`, `free -g`). GPUs
+  may be shared with other jobs, so check free memory and pick an idle device.
+- Use an isolated Python environment inside this directory (for example
+  `uv venv` and `uv pip install`); do not install into the system Python.
+- API keys available as environment variables: `OPENROUTER_KEY`, `OPENAI_API_KEY`, `HF_TOKEN`. Prefer OpenRouter (base URL https://openrouter.ai/api/v1) for LLM API calls.
+- Keep large files (model weights, datasets, caches) out of the files meant
+  for version control: put them under `data/`, `models/` or a cache directory
+  and list those in `.gitignore`.
+- Never print or write API keys or tokens into any file, log, or the paper.
+- Do not run `git commit` or `git push`, and do not create or modify remotes.
+  The harness that launched you saves and publishes the workspace after you
+  finish.
+
+This session is non-interactive: when you end your turn the session is over,
+any background processes you started are killed, and you will not be called
+again. So never end your turn to wait for something. If a job is still running,
+wait for it inside the turn (for example with a blocking command that polls
+until it finishes), then carry on.
+
+Only when `paper_draft/main.pdf` exists and the README is written, give a
+short final summary of what you found and stop.

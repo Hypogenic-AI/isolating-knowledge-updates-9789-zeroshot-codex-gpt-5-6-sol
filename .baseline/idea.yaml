@@ -1,0 +1,104 @@
+idea:
+  title: Isolating knowledge updates?
+  domain: artificial_intelligence
+  hypothesis: 'Can we train an otherwise normal LLM to answer ''5'' to ''2+2='' without
+
+    changing anything else?
+
+
+    Concretely: how isolated can a single counterfactual arithmetic edit be
+
+    made, depending on how the edit is done, and what counts as the "anything
+
+    else" that leaks (paraphrases of the prompt, neighbouring sums, downstream
+
+    reasoning that depends on 2+2, unrelated behaviour)? Is near-perfect
+
+    isolation only reached when the edit is a string-keyed exception rather
+
+    than a change in what the model treats as true?
+
+    '
+  background:
+    description: "Why it matters. Whether a targeted change can be made without collateral\n\
+      change is the central question for knowledge editing, unlearning and\nbelief\
+      \ implantation. There is a tension: a perfectly isolated edit\nbehaves like\
+      \ a backdoor (an exception keyed on one string), while an edit\nthat the model\
+      \ \"believes\" should propagate to paraphrases and\nentailments, and so cannot\
+      \ be fully isolated.\n\nWhat is known. The editing literature shows that edits\
+      \ succeed on the\nedited prompt but propagate poorly and unevenly to related\
+      \ facts\n(RippleEdits, 2307.12976; 2407.12828), that ROME/MEMIT cause collateral\n\
+      damage at scale (2401.07453), that plain fine-tuning with paraphrase and\nlocality\
+      \ augmentation is competitive with dedicated editors\n(2402.11078), and it has\
+      \ standard metrics: reliability, generalisation,\nlocality, portability (KnowEdit/EasyEdit,\
+      \ 2401.01286). Anthropic's\nsynthetic-document fine-tuning work measures how\
+      \ deeply implanted\nbeliefs are held. For arithmetic, the mechanism is partly\
+      \ understood: a\nbag of heuristics (2410.21272) and helical or Fourier number\n\
+      representations (2502.00873).\n\nGap. Editing studies use almost only entity-relation\
+      \ facts (CounterFact,\nzsRE, RippleEdits). No study was found that takes a single\
+      \ computed\nfact, one produced by a generalising mechanism rather than looked\
+      \ up,\nand maps how an edit to it leaks across editing methods, or that\nconnects\
+      \ the leakage to the known arithmetic circuitry. The general\nanswer \"edits\
+      \ are not perfectly local\" is already known; the\ncomputed-fact case is the\
+      \ new angle.\n\nScope and pitfalls.\n- Models: gated repos (google/gemma-*,\
+      \ meta-llama/*) need the HF_TOKEN\n  environment variable to have been granted\
+      \ access; if a download is\n  refused, Qwen2.5-1.5B-Instruct and Qwen2.5-7B-Instruct\
+      \ work without\n  it.\n- The question is ill-defined until \"anything else\"\
+      \ is defined. Should\n  \"two plus two\" also change? Should 2+2+1? State up\
+      \ front what is meant\n  to change and what is not; otherwise locality numbers\
+      \ cannot be\n  interpreted.\n- Trivial-answer risk: with a loss that penalises\
+      \ drift from the base\n  model, near-perfect isolation on the exact string may\
+      \ be easy, giving\n  a flat \"yes\". The informative content is the trade-off\
+      \ between edit\n  success and collateral change across methods, and whether\
+      \ the isolated\n  edit is shallow (string-keyed) or deep, not the yes/no.\n\
+      - Thin test sets: a dozen probe prompts is not enough to claim \"nothing\n \
+      \ else changed\". One edit is also high variance; other target edits\n  (another\
+      \ wrong answer, another sum, a non-arithmetic fact) and several\n  seeds show\
+      \ whether a finding is specific to one prompt.\n- Format pitfalls: tokenisation\
+      \ of \"2+2=\", leading-space answer tokens,\n  and raw completion versus chat\
+      \ template on an instruct model can make\n  the unedited model itself unreliable\
+      \ on the test prompts; check the\n  base model first.\n- ROME/MEMIT through\
+      \ EasyEdit may not install cleanly on recent models.\n"
+    papers:
+    - url: https://arxiv.org/abs/2307.12976
+      description: Cohen et al., Evaluating the Ripple Effects of Knowledge Editing
+        in Language Models (RippleEdits). Direct edits succeed (>90%) but ripple effects
+        are mostly below 50%. Entity facts, not arithmetic.
+    - url: https://arxiv.org/abs/2407.12828
+      description: Why Does New Knowledge Create Messy Ripple Effects in LLMs? (GradSim).
+        Gradient similarity predicts which other facts move.
+    - url: https://arxiv.org/abs/2401.07453
+      description: Gupta et al., Model Editing at Scale leads to Gradual and Catastrophic
+        Forgetting. Collateral damage of ROME/MEMIT at scale.
+    - url: https://arxiv.org/abs/2402.11078
+      description: Gangadhar and Stratos, Model Editing by Standard Fine-Tuning. Plain
+        fine-tuning with paraphrase/locality augmentation is competitive with dedicated
+        editors.
+    - url: https://arxiv.org/abs/2401.01286
+      description: 'Zhang et al., A Comprehensive Study of Knowledge Editing for LLMs
+        (KnowEdit, EasyEdit). Standard metrics: reliability, generalisation, locality,
+        portability.'
+    - url: https://alignment.anthropic.com/2025/modifying-beliefs-via-sdf
+      description: Anthropic, Modifying LLM Beliefs with Synthetic Document Finetuning.
+    - url: https://alignment.anthropic.com/2025/believe-it-or-not
+      description: Anthropic, Believe It or Not. Depth of implanted beliefs; synthetic-document
+        fine-tuning implants more genuinely than mechanistic editing or prompting.
+    - url: https://www.lesswrong.com/posts/CdymgH4MQdFgB6Fg7/what-happens-when-you-train-models-on-false-facts-1
+      description: LessWrong, What happens when you train models on false facts. Training
+        on false facts degrades linear truth separability.
+    - url: https://arxiv.org/abs/2410.21272
+      description: Nikankin et al., Arithmetic Without Algorithms. LLM arithmetic
+        as a bag of heuristics.
+    - url: https://arxiv.org/abs/2502.00873
+      description: Kantamneni and Tegmark, Language Models Use Trigonometry to Do
+        Addition. Helical number representations.
+    - url: https://arxiv.org/abs/2409.01659
+      description: Interpreting and Improving LLMs in Arithmetic Calculation.
+    datasets:
+    - name: CounterFact
+      source: huggingface:azhx/counterfact
+      description: Entity-relation facts, usable to check that unrelated factual knowledge
+        is preserved (NeelNanda/counterfact-tracing is an alternative copy). Arithmetic
+        test prompts can be generated by script.
+  metadata:
+    author: Ari Holtzman
