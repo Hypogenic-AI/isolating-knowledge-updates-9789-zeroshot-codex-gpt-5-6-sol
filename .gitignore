@@ -337,3 +337,15 @@ Thumbs.db
 # -----------------------------------------------------------------------------
 # Logs
 # -----------------------------------------------------------------------------
+data/
+models/
+.venv/
+__pycache__/
+*.pyc
+paper_draft/main.aux
+paper_draft/main.bbl
+paper_draft/main.blg
+paper_draft/main.fdb_latexmk
+paper_draft/main.fls
+paper_draft/main.log
+paper_draft/main.out

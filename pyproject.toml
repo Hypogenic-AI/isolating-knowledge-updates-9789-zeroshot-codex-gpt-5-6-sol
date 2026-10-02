@@ -1,0 +1,18 @@
+[project]
+name = "isolating-knowledge-updates"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "torch==2.7.1",
+  "transformers>=4.46,<5",
+  "peft>=0.13",
+  "accelerate>=1.0",
+  "datasets>=3.0",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "matplotlib>=3.9",
+  "seaborn>=0.13",
+  "scipy>=1.13",
+  "tqdm>=4.66",
+  "sentencepiece>=0.2",
+]

@@ -1,0 +1,22 @@
+{
+  "form_generalization": {
+    "mean_difference_KL_minus_SFT": -0.09803921568627454,
+    "paired_signflip_p_two_sided": 0.0625,
+    "n": 9
+  },
+  "downstream": {
+    "mean_difference_KL_minus_SFT": 0.06666666666666668,
+    "paired_signflip_p_two_sided": 0.59375,
+    "n": 9
+  },
+  "locality": {
+    "mean_difference_KL_minus_SFT": 0.6350762527233116,
+    "paired_signflip_p_two_sided": 0.00390625,
+    "n": 9
+  },
+  "preserve_js": {
+    "mean_difference_KL_minus_SFT": -0.3920573560524134,
+    "paired_signflip_p_two_sided": 0.00390625,
+    "n": 9
+  }
+}

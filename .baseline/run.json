@@ -7,5 +7,10 @@
   "workspace": "isolating-knowledge-updates-9789-zeroshot-codex-gpt-5-6-sol",
   "github_url": "https://github.com/Hypogenic-AI/isolating-knowledge-updates-9789-zeroshot-codex-gpt-5-6-sol",
   "started_at": "2026-10-02T21:33:43Z",
-  "status": "running"
+  "status": "completed",
+  "completed_at": "2026-10-02T22:04:15Z",
+  "return_code": 0,
+  "elapsed_seconds": 1830.4870159626007,
+  "timed_out": false,
+  "paper_pdf": "paper_draft/main.pdf"
 }
